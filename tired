@@ -1,0 +1,47 @@
+import requests
+import schedule
+import time
+import logging
+from datetime import datetime
+
+# Конфигурация логирования
+logging.basicConfig(filename='fatigue_index.log', level=logging.INFO, 
+                    format='%(asctime)s %(message)s')
+
+# Функция для получения данных от API
+def get_fatigue_data():
+    # Пример запроса к API (замените на реальный URL и параметры)
+    response = requests.get('https://api.example.com/fatigue_data')
+    if response.status_code == 200:
+        return response.json()
+    else:
+        logging.error('Failed to fetch data from API')
+        return None
+
+# Функция для вычисления индекса усталости
+def calculate_fatigue_index(data):
+    # Пример простого расчета (можно усложнить по необходимости)
+    activity_level = data['activity_level']
+    sleep_duration = data['sleep_duration']
+    stress_level = data['stress_level']
+    
+    # Простейшая формула для вычисления индекса усталости
+    fatigue_index = (10 - sleep_duration) + stress_level + (activity_level / 10)
+    return fatigue_index
+
+# Основная функция
+def main():
+    data = get_fatigue_data()
+    if data:
+        fatigue_index = calculate_fatigue_index(data)
+        logging.info(f'Fatigue index: {fatigue_index}')
+        print(f'Fatigue index: {fatigue_index}')
+
+# Планирование выполнения задачи раз в час
+schedule.every().hour.do(main)
+
+if __name__ == '__main__':
+    print("Starting fatigue index calculation service...")
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
